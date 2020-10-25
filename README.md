@@ -1,2 +1,2 @@
-# Incremental-Learning-
-Machine learning and deep learning course final exam project
+# Incremental-Learning
+*Machine learning and deep learning* course final exam project
