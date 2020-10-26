@@ -11,7 +11,7 @@ class ilCIFAR100(CIFAR100):
     test and train CIFAR100 splits:
         - train -> batches is a dictionary {0:{'train':indexes, 'val':indexes}...} 
         - test -> batches is a dictionary {0:indexes...}
-    where the key are the batch number.
+    where the keys are the batch number.
 
     Args:
         root (string): Root directory of dataset where directory
