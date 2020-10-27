@@ -29,7 +29,7 @@ class ilCIFAR100(CIFAR100):
             downloaded again.
     """
     def __init__(self, root, seed, val_size=0.1, train=True, transform=None, target_transform=False, 
-    download=False):
+    download=True):
         
         super(ilCIFAR100, self).__init__(root=root, train=train, transform=transform, 
         target_transform=target_transform, download=download)
@@ -88,12 +88,3 @@ class ilCIFAR100(CIFAR100):
             self.__rs.shuffle(batches[batch]['val']) # otherwise same class elements are subsequent 
             self.__rs.shuffle(batches[batch]['train'])
         return batches
-                
-
-    
-
-        
-
-
-
-         
