@@ -35,15 +35,15 @@ class ilCIFAR100(CIFAR100):
         target_transform=target_transform, download=download)
         
         self.targets = np.array(self.targets) # make targets an array to exploit masking
-        self.__rs = np.random.RandomState(seed) # set random seed
-        self.__classes_per_batch = self.__get_classes_per_batch() 
+        self._rs = np.random.RandomState(seed) # set random seed
+        self._classes_per_batch = self._get_classes_per_batch() 
         if train:
-            self.batches = self.__make_train_batches(val_size)
+            self.batches = self._make_train_batches(val_size)
         else:
-            self.batches = self.__make_test_batches()
+            self.batches = self._make_test_batches()
         
 
-    def __get_classes_per_batch(self):
+    def _get_classes_per_batch(self):
         """
             Args: 
 
@@ -51,11 +51,11 @@ class ilCIFAR100(CIFAR100):
                 2D-array: rows are associated to batch number and columns to batch class labels
         """
         labels = np.arange(0, 100, 1)
-        self.__rs.shuffle(labels)
+        self._rs.shuffle(labels)
         labels = labels.reshape((10, -1)) # each row contains the classes for the corrisponding batch
         return labels
 
-    def __make_test_batches(self):
+    def _make_test_batches(self):
         """
             Args:
 
@@ -65,11 +65,11 @@ class ilCIFAR100(CIFAR100):
         """
         batches = {key:[] for key in range(10)}
         for batch in range(10):
-            for label in self.__classes_per_batch[batch, :]: # select labels of the corrisponding batch
+            for label in self._classes_per_batch[batch, :]: # select labels of the corrisponding batch
                 batches[batch] += list(np.where(self.targets == label)[0]) # np.where() is a tuple, the first element is the indexes array
         return batches
 
-    def __make_train_batches(self, val_size):
+    def _make_train_batches(self, val_size):
         """
             Args: 
                 val_size (float): fraction of samples used for validation, assumes values in range [0,1]
@@ -80,11 +80,11 @@ class ilCIFAR100(CIFAR100):
         """
         batches = {key: {'train': [], 'val': []} for key in range(10)}
         for batch in range(10):
-            for label in self.__classes_per_batch[batch, :]:
+            for label in self.classes_per_batch[batch, :]:
                 indexes = list(np.where(self.targets == label)[0])
                 val_length = int(len(indexes)*val_size) # to split the data for the current class label
                 batches[batch]['val'] += indexes[:val_length]
                 batches[batch]['train'] += indexes[val_length:]
-            self.__rs.shuffle(batches[batch]['val']) # otherwise same class elements are subsequent 
-            self.__rs.shuffle(batches[batch]['train'])
+            self.__s.shuffle(batches[batch]['val']) # otherwise same class elements are subsequent 
+            self._rs.shuffle(batches[batch]['train'])
         return batches
