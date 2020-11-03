@@ -1,5 +1,39 @@
 import numpy as np
+"""
+code example of how the class is intended to be used:
 
+log = ResultsLog()
+# cycle on runs
+for i in range(3):
+    
+    # make the log know a new run starts
+    log.new_run() 
+    
+    # cycle on class batches
+    for j in range(10):
+        
+        # make the log know a new batch of classes starts
+        log.new_class_batch() 
+        
+        # cycle on epochs 
+        for k in range(15):
+            # make the log know a new epoch starts
+            log.new_epoch()
+            
+            # train and validate the network
+            # ...compute info here...
+            
+            # update current batch info
+            log.add_info(train_acc=1, val_acc=2, train_loss=3, val_loss=4, model_params=7) 
+        
+        # make test with the best model
+
+        # add test accuracy
+        log.add_info(test_acc=5)
+
+        # update global info
+        log.commit_batch_info()
+"""
 
 
 class ResultsLog():
@@ -11,7 +45,15 @@ class ResultsLog():
         self._current_run = -1
         self._current_batch = -1
         self._current_epoch = -1
-        self._batch_info = {'train_acc':[], 'train_loss':[], 'val_acc':[], 'val_loss':[], 'best_val_loss':{'value':np.inf, 'epoch':None}, 'test_acc':None, 'best_model':None}
+        self._batch_info = {
+            'train_acc':[], 
+            'train_loss':[], 
+            'val_acc':[], 
+            'val_loss':[], 
+            'best_val_loss':{'value':np.inf, 'epoch':None}, 
+            'test_acc':None, 
+            'best_model':None
+            }
         self.run_info = {key_run:{} for key_run in range(self._num_run)}
 
 
@@ -23,7 +65,8 @@ class ResultsLog():
         self._current_run += 1
         self._current_batch = -1
         if self._print_info:
-            print("RUN %i ------------------------------------------------------------------------------------\n" % (self._current_run), end='\n')
+            print("RUN %i ------------------------------------------------------------------------------------\n" % \
+                (self._current_run), end='\n')
 
 
     def new_class_batch(self):
@@ -64,12 +107,19 @@ class ResultsLog():
                 self._batch_info['best_model'] = model_params
             # print values
             if self._print_info:
-                print("\tepoch %2i:    train_acc: %.3f  train_loss: %.3f  val_acc: %.3f  val_loss: %.3f" % (self._current_epoch, self._batch_info['train_acc'][-1], self._batch_info['train_loss'][-1], self._batch_info['val_acc'][-1], self._batch_info['val_loss'][-1]), end='\n')
+                print("\tepoch %2i:    train_acc: %.3f  train_loss: %.3f  val_acc: %.3f  val_loss: %.3f" % \
+                    (self._current_epoch, 
+                     self._batch_info['train_acc'][-1], 
+                     self._batch_info['train_loss'][-1], 
+                     self._batch_info['val_acc'][-1], 
+                     self._batch_info['val_loss'][-1]), end='\n')
         
         if test_acc != None:
             self._batch_info['test_acc'] = test_acc
             if self._print_info:
-                print("\n\tBEST VAL LOSS is %.3f in epoch %i" % (self._batch_info['best_val_loss']['value'], self._batch_info['best_val_loss']['epoch']), end='\n')
+                print("\n\tBEST VAL LOSS is %.3f in epoch %i" % \
+                    (self._batch_info['best_val_loss']['value'], 
+                     self._batch_info['best_val_loss']['epoch']), end='\n')
                 print("\tTEST ACC: %.3f\n\n" % (self._batch_info['test_acc']))
     
     
@@ -81,7 +131,15 @@ class ResultsLog():
         """
 
         self.run_info[self._current_run][self._current_batch] = self._batch_info
-        self._batch_info = {'train_acc':[], 'train_loss':[], 'val_acc':[], 'val_loss':[], 'best_val_loss':{'value':np.inf, 'epoch':None}, 'test_acc':None, 'best_model':None}
+        self._batch_info = {
+            'train_acc':[], 
+            'train_loss':[], 
+            'val_acc':[], 
+            'val_loss':[], 
+            'best_val_loss':{'value':np.inf, 'epoch':None}, 
+            'test_acc':None, 
+            'best_model':None
+            }
 
 
     def info2file(self):
