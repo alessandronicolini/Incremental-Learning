@@ -120,9 +120,7 @@ class ResultsLog():
                      self._epochs_info['best']['epoch_num']), end='\n')
                 print("\tTEST ACC: %.3f\n\n" % (self._epochs_info['test_acc']))
         
-
-
-
+        
     def to_file(self, folder):
         """
             save registered info as a pickle file
