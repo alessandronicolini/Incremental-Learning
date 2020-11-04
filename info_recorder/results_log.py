@@ -9,11 +9,14 @@ TO DO:
 class ResultsLog():
 
 
-    def __init__(self, print_info=True):
+    def __init__(self, num_runs=3, num_batches=10, num_epochs=15, print_info=True):
         self._print_info = print_info
-        self._current_run = -1
-        self._current_batch = -1
-        self._current_epoch = -1
+        self._num_runs = num_runs
+        self._num_batches = num_batches
+        self._num_epochs = num_epochs
+        self._run_counter = -1
+        self._batch_counter = -1
+        self._epoch_counter = -1
         self._batches_info = None
         self._epochs_info = None
         self.runs_info = dict()
@@ -25,17 +28,17 @@ class ResultsLog():
         """
 
         # increment runs counter and set up the corrisponding element od runs_info dict
-        self._current_run += 1
-        self.runs_info[self._current_run] = None
+        self._run_counter += 1
+        self.runs_info[self._run_counter] = None
 
         # initialize batch counter and _batches_info dict
-        self._current_batch = -1
+        self._batch_counter = -1
         self._batches_info = dict()
 
         # print on console if requested
         if self._print_info:
             print("RUN %i ------------------------------------------------------------------------------------\n" % \
-                (self._current_run), end='\n')
+                (self._run_counter), end='\n')
 
 
     def new_class_batch(self):
@@ -44,11 +47,11 @@ class ResultsLog():
         """ 
 
         # increment batch counter and set up the corrisponding element on _batch_infor dict
-        self._current_batch += 1
-        self._batches_info[self._current_batch] = None
+        self._batch_counter += 1
+        self._batches_info[self._batch_counter] = None
         
         # initialize epoch counter and _epoch_info dict
-        self._current_epoch = -1
+        self._epoch_counter = -1
         self._epochs_info = {
             'train_acc':[],
             'train_loss':[],
@@ -60,7 +63,7 @@ class ResultsLog():
 
         # print on console if requested
         if self._print_info:
-            print("\tCLASS BATCH %i\n" % (self._current_batch), end='\n')
+            print("\tCLASS BATCH %i\n" % (self._batch_counter), end='\n')
     
     def new_epoch(self):
         """
@@ -68,10 +71,10 @@ class ResultsLog():
         """
 
         # increment epoch counter
-        self._current_epoch += 1
+        self._epoch_counter += 1
 
 
-    def update_epochs_info(self, train_acc=None, train_loss=None, val_acc=None, val_loss=None, 
+    def store_info(self, train_acc=None, train_loss=None, val_acc=None, val_loss=None, 
     test_acc=None, model_params=None):
         """
             updates current class batch info, use it:
@@ -89,13 +92,13 @@ class ResultsLog():
             # update best info
             if val_loss < self._epochs_info['best']['val_loss']:
                 self._epochs_info['best']['val_loss'] = val_loss
-                self._epochs_info['best']['epoch_num'] = self._current_epoch
+                self._epochs_info['best']['epoch_num'] = self._epoch_counter
                 self._epochs_info['best']['model_params'] = model_params
             
             # print train_acc, train_loss, val_acc, val_loss
             if self._print_info:
                 print("\tepoch %2i:    train_acc: %.3f  train_loss: %.3f  val_acc: %.3f  val_loss: %.3f" % \
-                    (self._current_epoch, 
+                    (self._epoch_counter, 
                      self._epochs_info['train_acc'][-1], 
                      self._epochs_info['train_loss'][-1], 
                      self._epochs_info['val_acc'][-1], 
@@ -104,27 +107,20 @@ class ResultsLog():
         elif test_acc != None:
             self._epochs_info['test_acc'] = test_acc
             
-            # epochs terminated: add current _epochs_info to _batch_info
-            self._batches_info[self._current_batch] = self._epochs_info
-
+            # check for updating batch and run info
+            self._batches_info[self._batch_counter] = self._epochs_info
+            
+            if self._batch_counter == self._num_batches-1:
+                self.runs_info[self._run_counter] = self._batches_info
+            
             # print test acc and best val loss
             if self._print_info:
                 print("\n\tBEST VAL LOSS is %.3f in epoch %i" % \
                     (self._epochs_info['best']['val_loss'], 
                      self._epochs_info['best']['epoch_num']), end='\n')
                 print("\tTEST ACC: %.3f\n\n" % (self._epochs_info['test_acc']))
-    
-    
-    def update_batches_info(self):
-        self._batches_info[self._current_batch] = self._epochs_info
+        
 
-    def update_runs_info(self):
-        """
-            actually update the global info adding the class batch info just recorded,
-            use it at the end of the epoch
-        """
-
-        self.runs_info[self._current_run] = self._batches_info
 
 
     def to_file(self, folder):

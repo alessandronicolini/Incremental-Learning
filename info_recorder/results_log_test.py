@@ -25,17 +25,13 @@ for i in range(3):
             """
 
             # update _epochs_info
-            log.update_epochs_info(train_acc=1, val_acc=2, train_loss=3, val_loss=4, model_params=7) 
+            log.store_info(train_acc=1, val_acc=2, train_loss=3, val_loss=4, model_params=7) 
         
         """
             test the best model
         """  
         # add test accuracy
-        log.update_epochs_info(test_acc=5)    
-        # update batches info before starting a new one
-        log.update_batches_info()  
-    # update runs before starting the new run
-    log.update_runs_info()
+        log.store_info(test_acc=5)    
 
 log.to_file(folder)
 print(log.runs_info)
