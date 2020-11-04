@@ -3,31 +3,20 @@ import pickle
 
 """
 TO DO: 
-    - check the add_info method
-    - add name attribute 
-    - add info2file method, save file as self.name.csv
     - in the benchmark class create a directory for the results of the current method 
 """
 
 class ResultsLog():
 
 
-    def __init__(self, num_run=3, print_info=True):
+    def __init__(self, print_info=True):
         self._print_info = print_info
-        self._num_run = num_run
         self._current_run = -1
         self._current_batch = -1
         self._current_epoch = -1
-        self._batch_info = {
-            'train_acc':[], 
-            'train_loss':[], 
-            'val_acc':[], 
-            'val_loss':[], 
-            'best_val_loss':{'value':np.inf, 'epoch':None}, 
-            'test_acc':None, 
-            'best_model':None
-            }
-        self.run_info = {key_run:{} for key_run in range(self._num_run)}
+        self._batches_info = None
+        self._epochs_info = None
+        self.runs_info = dict()
 
 
     def new_run(self):
@@ -35,8 +24,15 @@ class ResultsLog():
             updates current run index and inizialize the class batch index
         """
 
+        # increment runs counter and set up the corrisponding element od runs_info dict
         self._current_run += 1
+        self.runs_info[self._current_run] = None
+
+        # initialize batch counter and _batches_info dict
         self._current_batch = -1
+        self._batches_info = dict()
+
+        # print on console if requested
         if self._print_info:
             print("RUN %i ------------------------------------------------------------------------------------\n" % \
                 (self._current_run), end='\n')
@@ -47,8 +43,22 @@ class ResultsLog():
             updates the current class batch index: starts from 0 up to 9.
         """ 
 
+        # increment batch counter and set up the corrisponding element on _batch_infor dict
         self._current_batch += 1
+        self._batches_info[self._current_batch] = None
+        
+        # initialize epoch counter and _epoch_info dict
         self._current_epoch = -1
+        self._epochs_info = {
+            'train_acc':[],
+            'train_loss':[],
+            'val_acc':[],
+            'val_loss':[],
+            'best': {'val_loss': np.inf, 'epoch_num':None, 'model_params':None},
+            'test_acc': None
+        }
+
+        # print on console if requested
         if self._print_info:
             print("\tCLASS BATCH %i\n" % (self._current_batch), end='\n')
     
@@ -56,10 +66,12 @@ class ResultsLog():
         """
             update current epoch index
         """
+
+        # increment epoch counter
         self._current_epoch += 1
 
 
-    def add_info(self, train_acc=None, train_loss=None, val_acc=None, val_loss=None, 
+    def update_epochs_info(self, train_acc=None, train_loss=None, val_acc=None, val_loss=None, 
     test_acc=None, model_params=None):
         """
             updates current class batch info, use it:
@@ -69,54 +81,50 @@ class ResultsLog():
         """
 
         if train_acc!=None and train_loss!=None and val_acc!=None and val_loss!=None and model_params!=None:
-            self._batch_info['train_acc'].append(train_acc)
-            self._batch_info['train_loss'].append(train_loss)
-            self._batch_info['val_acc'].append(val_acc)
-            self._batch_info['val_loss'].append(val_loss)
+            self._epochs_info['train_acc'].append(train_acc)
+            self._epochs_info['train_loss'].append(train_loss)
+            self._epochs_info['val_acc'].append(val_acc)
+            self._epochs_info['val_loss'].append(val_loss)
             
-            # update best validation loss
-            if val_loss < self._batch_info['best_val_loss']['value']:
-                self._batch_info['best_val_loss']['value'] = val_loss
-                self._batch_info['best_val_loss']['epoch'] = self._current_epoch
-                self._batch_info['best_model'] = model_params
+            # update best info
+            if val_loss < self._epochs_info['best']['val_loss']:
+                self._epochs_info['best']['val_loss'] = val_loss
+                self._epochs_info['best']['epoch_num'] = self._current_epoch
+                self._epochs_info['best']['model_params'] = model_params
             
             # print train_acc, train_loss, val_acc, val_loss
             if self._print_info:
                 print("\tepoch %2i:    train_acc: %.3f  train_loss: %.3f  val_acc: %.3f  val_loss: %.3f" % \
                     (self._current_epoch, 
-                     self._batch_info['train_acc'][-1], 
-                     self._batch_info['train_loss'][-1], 
-                     self._batch_info['val_acc'][-1], 
-                     self._batch_info['val_loss'][-1]), end='\n')
+                     self._epochs_info['train_acc'][-1], 
+                     self._epochs_info['train_loss'][-1], 
+                     self._epochs_info['val_acc'][-1], 
+                     self._epochs_info['val_loss'][-1]), end='\n')
 
         elif test_acc != None:
-            self._batch_info['test_acc'] = test_acc
+            self._epochs_info['test_acc'] = test_acc
+            
+            # epochs terminated: add current _epochs_info to _batch_info
+            self._batches_info[self._current_batch] = self._epochs_info
 
             # print test acc and best val loss
             if self._print_info:
                 print("\n\tBEST VAL LOSS is %.3f in epoch %i" % \
-                    (self._batch_info['best_val_loss']['value'], 
-                     self._batch_info['best_val_loss']['epoch']), end='\n')
-                print("\tTEST ACC: %.3f\n\n" % (self._batch_info['test_acc']))
+                    (self._epochs_info['best']['val_loss'], 
+                     self._epochs_info['best']['epoch_num']), end='\n')
+                print("\tTEST ACC: %.3f\n\n" % (self._epochs_info['test_acc']))
     
     
+    def update_batches_info(self):
+        self._batches_info[self._current_batch] = self._epochs_info
 
-    def commit_batch_info(self):
+    def update_runs_info(self):
         """
             actually update the global info adding the class batch info just recorded,
             use it at the end of the epoch
         """
 
-        self.run_info[self._current_run][self._current_batch] = self._batch_info
-        self._batch_info = {
-            'train_acc':[], 
-            'train_loss':[], 
-            'val_acc':[], 
-            'val_loss':[], 
-            'best_val_loss':{'value':np.inf, 'epoch':None}, 
-            'test_acc':None, 
-            'best_model':None
-            }
+        self.runs_info[self._current_run] = self._batches_info
 
 
     def to_file(self, folder):
@@ -124,6 +132,6 @@ class ResultsLog():
             save registered info as a pickle file
         """
         with open(folder+"/runs_info.pkl", "wb") as file:
-            pickle.dump(self.run_info, file, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(self.runs_info, file, pickle.HIGHEST_PROTOCOL)
     
 
