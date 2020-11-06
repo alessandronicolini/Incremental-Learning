@@ -2,7 +2,10 @@ from results_log import ResultsLog
 import os
 
 folder = "test_results"
-os.mkdir(folder)
+try:
+    os.mkdir(folder)
+except FileExistsError:
+    pass
 
 log = ResultsLog()
 
