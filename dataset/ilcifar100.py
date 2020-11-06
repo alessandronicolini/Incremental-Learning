@@ -28,7 +28,7 @@ class ilCIFAR100(CIFAR100):
             puts it in root directory. If dataset is already downloaded, it is not
             downloaded again.
     """
-    def __init__(self, root, seed, val_size=0.1, train=True, transform=None, target_transform=False, 
+    def __init__(self, root, seed, val_size=0.1, train=True, transform=None, target_transform=None, 
     download=True):
         
         super(ilCIFAR100, self).__init__(root=root, train=train, transform=transform, 
