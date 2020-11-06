@@ -34,7 +34,6 @@ class ilCIFAR100(CIFAR100):
         super(ilCIFAR100, self).__init__(root=root, train=train, transform=transform, 
         target_transform=target_transform, download=download)
         
-        self.targets = np.array(self.targets) # make targets an array to exploit masking
         self._rs = np.random.RandomState(seed) # set random seed
         self._classes_per_batch = self._get_classes_per_batch() 
         if train:
@@ -66,7 +65,7 @@ class ilCIFAR100(CIFAR100):
         batches = {key:[] for key in range(10)}
         for batch in range(10):
             for label in self._classes_per_batch[batch, :]: # select labels of the corrisponding batch
-                batches[batch] += list(np.where(self.targets == label)[0]) # np.where() is a tuple, the first element is the indexes array
+                batches[batch] += list(np.where(np.array(self.targets) == label)[0]) # np.where() is a tuple, the first element is the indexes array
         return batches
 
     def _make_train_batches(self, val_size):
@@ -81,7 +80,7 @@ class ilCIFAR100(CIFAR100):
         batches = {key: {'train': [], 'val': []} for key in range(10)}
         for batch in range(10):
             for label in self._classes_per_batch[batch, :]:
-                indexes = list(np.where(self.targets == label)[0])
+                indexes = list(np.where(np.array(self.targets) == label)[0])
                 val_length = int(len(indexes)*val_size) # to split the data for the current class label
                 batches[batch]['val'] += indexes[:val_length]
                 batches[batch]['train'] += indexes[val_length:]
