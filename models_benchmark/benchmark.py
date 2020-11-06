@@ -18,8 +18,12 @@ class Benchmark():
     def _train_batch(self, data_batch):
         pass
 
-    def _train_epoch(self):
-        pass
+    def _train_epoch(self, run, class_batch):
+        number_of_elements = None
+        running_loss = 0
+        running_corrects = 0
+        for data_batch in dataloaders[run][class_batch]['train']:
+            pass
 
     def _validate(self):
         pass
@@ -34,15 +38,22 @@ class Benchmark():
         
         # cycle for each run
         for run in self.num_runs:
-            self.log.new_run() # update log internal state
+            
+            # update log internal state
+            self.log.new_run() 
             
             # cycle for each class_batch 
             for class_batch in self.num_class_batches:
-                self.log.new_class_batch() # update log internal state
                 
+                # update log internal state
+                self.log.new_class_batch() 
+            
                 # cycle for each epoch
                 for epoch in self.num_epochs:
-                    self.log.new_epoch() # update log internal state
+                    
+                    # update log internal state
+                    self.log.new_epoch() 
+                    
                     pass 
 
 
