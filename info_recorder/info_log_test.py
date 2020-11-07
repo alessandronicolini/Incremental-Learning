@@ -1,4 +1,4 @@
-from results_log import ResultsLog
+from info_log import InfoLog
 import os
 
 folder = "test_results"
@@ -7,7 +7,7 @@ try:
 except FileExistsError:
     pass
 
-log = ResultsLog()
+log = InfoLog()
 
 # cycle on runs
 for i in range(3):
@@ -28,7 +28,7 @@ for i in range(3):
             """
 
             # update _epochs_info
-            log.store_info(train_acc=1, val_acc=2, train_loss=3, val_loss=4, model_params=7) 
+            log.store_info(train_acc=1, val_acc=2, train_loss=3, val_loss=4, state_dict=7) 
         
         """
             test the best model

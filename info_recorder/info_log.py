@@ -4,9 +4,10 @@ import pickle
 """
 TO DO: 
     - in the benchmark class create a directory for the results of the current method 
+    - add training time information
 """
 
-class ResultsLog():
+class InfoLog():
 
 
     def __init__(self, num_runs=3, num_batches=10, num_epochs=15, print_info=True):
@@ -57,7 +58,7 @@ class ResultsLog():
             'train_loss':[],
             'val_acc':[],
             'val_loss':[],
-            'best': {'val_loss': np.inf, 'epoch_num':None, 'model_params':None},
+            'best': {'val_loss': np.inf, 'epoch_num':None, 'state_dict':None},
             'test_acc': None
         }
 
@@ -75,7 +76,7 @@ class ResultsLog():
 
 
     def store_info(self, train_acc=None, train_loss=None, val_acc=None, val_loss=None, 
-    test_acc=None, model_params=None):
+    test_acc=None, state_dict=None):
         """
             updates current class batch info, use it:
             - in the epoch cycle: to record train_acc, val_loss, val_acc, val_loss and to update
@@ -83,7 +84,7 @@ class ResultsLog():
             - at the end of epochs: to record test_acc
         """
 
-        if train_acc!=None and train_loss!=None and val_acc!=None and val_loss!=None and model_params!=None:
+        if train_acc!=None and train_loss!=None and val_acc!=None and val_loss!=None and state_dict!=None:
             self._epochs_info['train_acc'].append(train_acc)
             self._epochs_info['train_loss'].append(train_loss)
             self._epochs_info['val_acc'].append(val_acc)
@@ -93,7 +94,7 @@ class ResultsLog():
             if val_loss < self._epochs_info['best']['val_loss']:
                 self._epochs_info['best']['val_loss'] = val_loss
                 self._epochs_info['best']['epoch_num'] = self._epoch_counter
-                self._epochs_info['best']['model_params'] = model_params
+                self._epochs_info['best']['state_dict'] = state_dict
             
             # print train_acc, train_loss, val_acc, val_loss
             if self._print_info:
