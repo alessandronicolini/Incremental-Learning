@@ -142,19 +142,19 @@ class ResNet(nn.Module):
 
     def add_nodes(self, class_batch):
         # copy current fc params
-        old_weight = self.model.state_dict['fc.weight']
-        old_bias = self.model.state_dict['fc.bias']
+        old_weight = self.state_dict()['fc.weight']
+        old_bias = self.state_dict()['fc.bias']
         
         # create new fc layer
         self.fc = nn.Linear(64 * self.expansion, self.num_classes*class_batch)
         
         # upload old fc params
-        w_shape0 = current_weight.shape[0]
-        w_shape1 = current_weight.shape[1]
-        self.model_state_dict['fc.weight'][:w_shape0, :w_shape1] = old_weight
+        w_shape0 = old_weight.shape[0]
+        w_shape1 = old_weight.shape[1]
+        self.state_dict()['fc.weight'][:w_shape0, :w_shape1] = old_weight
 
-        b_shape0 = current_bias.shape[0]
-        self.model_state_dict['fc.bias'][:b_shape0] = old_bias
+        b_shape0 = old_bias.shape[0]
+        self.state_dict()['fc.bias'][:b_shape0] = old_bias
 
 def resnet20(pretrained=False, **kwargs):
     n = 3
