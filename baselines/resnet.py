@@ -1,4 +1,4 @@
-import torch.nn as nn
+git import torch.nn as nn
 import math
 import torch.utils.model_zoo as model_zoo
 
@@ -88,6 +88,8 @@ class ResNet(nn.Module):
 
     def __init__(self, block, layers, num_classes=10):
         self.inplanes = 16
+        self.expansion = block.expansion
+        self.num_classes = num_classes
         super(ResNet, self).__init__()
         self.conv1 = nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1,
                                bias=False)
@@ -97,7 +99,7 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, 32, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 64, layers[2], stride=2)
         self.avgpool = nn.AvgPool2d(8, stride=1)
-        self.fc = nn.Linear(64 * block.expansion, num_classes)
+        self.fc = nn.Linear(64 * self.expansion, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -137,6 +139,22 @@ class ResNet(nn.Module):
         x = self.fc(x)
 
         return x
+
+    def add_nodes(self, class_batch):
+        # copy current fc params
+        old_weight = self.model.state_dict['fc.weight']
+        old_bias = self.model.state_dict['fc.bias']
+        
+        # create new fc layer
+        self.fc = nn.Linear(64 * self.expansion, self.num_classes*class_batch)
+        
+        # upload old fc params
+        w_shape0 = current_weight.shape[0]
+        w_shape1 = current_weight.shape[1]
+        self.model_state_dict['fc.weight'][:w_shape0, :w_shape1] = old_weight
+
+        b_shape0 = current_bias.shape[0]
+        self.model_state_dict['fc.bias'][:b_shape0] = old_bias
 
 def resnet20(pretrained=False, **kwargs):
     n = 3
