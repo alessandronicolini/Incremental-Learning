@@ -92,6 +92,7 @@ class Benchmark():
         test_acc = running_corrects / number_of_elements
         return test_acc
 
+
     def execute(self, method_name, savings_folder="savings"):
         
         # create method folder (finetuning, lwf, icarl) inside the savings folder
@@ -112,6 +113,9 @@ class Benchmark():
             for class_batch in self.num_class_batches:
                 self.log.new_class_batch() 
                 
+                # add 10 new fully connected nodes
+                self.model.add_nodes(class_batch)
+
                 # cycle for each epoch
                 for epoch in self.num_epochs:
                     self.log.new_epoch()
