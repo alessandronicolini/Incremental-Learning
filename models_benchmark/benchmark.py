@@ -3,20 +3,27 @@ import os
 
 class Benchmark():
     
-    def __init__(self, num_runs, num_class_batches, num_epochs, batch_size, dataloaders,
-     seeds, model, criterion, optimizer, scheduler, InfoLog, device='cuda'):
+    def __init__(self, num_epochs, criterion, optimizer, scheduler, 
+    InfoLog, device='cuda', saving_folder=None):
+        
+        # create a saving folder for the current method
+        if saving_folder!= None and method_name!= None:
+            try:
+                os.mkdir(saving_folder)
+            except FileExistsError:
+
         self.device = device
         self.num_epochs = num_epochs
-        self.num_runs = num_runs
-        self.num_class_batches = num_class_batches
+        
         self.batch_size = batch_size
         self.dataloaders = dataloaders
-        self.seeds = seeds
-        self.model = model.to(device)
+        self.model = None
+
         self.criterion = criterion
         self.optimizer = optimizer
         self.scheduler = scheduler
-        self.log = InfoLog(num_runs=num_runs, num_batches=num_class_batch, num_epochs=num_epochs)
+
+        self.log = InfoLog(saving_folder=saving_folder)
         
 
     def _do_batch(self, inputs, labels, train=True):
@@ -93,57 +100,34 @@ class Benchmark():
         return test_acc
 
 
-    def execute(self, method_name, savings_folder="savings"):
+    def do_class_batch(self, run, class_batch):
         
-        # create method folder (finetuning, lwf, icarl) inside the savings folder
-        try:
-            os.mkdir(savings_folder)
-        except FileExistsError:
-            try:
-                os.mkdir(method_name)
-            except FileExistsError:
-                pass
-        saving_path = saving_folder+"/"+method_name
-
-        # cycle for each run
-        for run in self.num_runs:
-            self.log.new_run() 
-            
-            # cycle for each class_batch 
-            for class_batch in self.num_class_batches:
-                self.log.new_class_batch() 
-                
-                # add 10 new fully connected nodes
-                self.model.add_nodes(class_batch)
-
-                # cycle for each epoch
-                for epoch in self.num_epochs:
-                    self.log.new_epoch()
+        # cycle for each epoch
+        for epoch in self.num_epochs:
+            self.log.new_epoch()
                     
-                    # get training info
-                    train_epoch_loss, train_epoch_acc = self._do_epoch(run, class_batch, train=True)
+            # get training info
+            train_epoch_loss, train_epoch_acc = self._do_epoch(run, class_batch, train=True)
                     
-                    # get validation info
-                    val_epoch_loss, val_epoch_acc = self._do_epoch(run, class_batch, train=False) 
+            # get validation info
+            val_epoch_loss, val_epoch_acc = self._do_epoch(run, class_batch, train=False) 
                     
-                    # store info
-                    self.log.store_info(
-                        train_acc=train_epoch_acc, 
-                        train_loss=train_epoch_loss, 
-                        val_acc=val_epoch_acc,
-                        val_loss=val_epoch_loss,
-                        model_params=deepcopy(self.model.state_dict()))
+            # store info
+            self.log.store_info(
+                train_acc=train_epoch_acc, 
+                train_loss=train_epoch_loss, 
+                val_acc=val_epoch_acc,
+                val_loss=val_epoch_loss,
+                model_params=deepcopy(self.model.state_dict()))
                 
-                # load best model state_dict
-                best_state_dict = self.log.runs_info[run][class_batch]['best']['state_dict']
-                self.model.load_state_dict(best_state_dict)
+        # load best model state_dict
+        best_state_dict = self.log.run_info[-1]['best']['state_dict']
+        self.model.load_state_dict(best_state_dict)
                 
-                # get test dataloader and compute test acc
-                test_dataloader = self.dataloaders[run][class_batch]['test']
-                test_acc = self._test(test_dataloader)
+        # get test dataloader and compute test acc
+        test_dataloader = self.dataloaders[run][class_batch]['test']
+        test_acc = self._test(test_dataloader)
                 
-                # update info log
-                self.log.store_info(test_acc=test_acc)
+        # update info log
+        self.log.store_info(test_acc=test_acc)
 
-        # save collected info
-        self.log.to_file(saving_path)

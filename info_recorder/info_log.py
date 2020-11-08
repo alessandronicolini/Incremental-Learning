@@ -93,7 +93,7 @@ class InfoLog():
             
             # print test acc and best val loss
             if self._print_info:
-                print("\n\tBEST RESULTS:\tval_loss: %.3f,  val_acc: %.3f,  epoch: %i" % \
+                print("\n\tBEST RESULTS:\tval_loss: %.3f,  val_acc: %.3f,  epoch:git push  %i" % \
                     (self._batch_info['best']['val_loss'],
                      self._batch_info['best']['val_acc'], 
                      self._batch_info['best']['epoch_num']), end='\n')
