@@ -7,7 +7,7 @@ try:
 except FileExistsError:
     pass
 
-log = InfoLog()
+log = InfoLog(saving_folder=folder)
 
 # cycle on runs
 for i in range(3):
@@ -35,6 +35,3 @@ for i in range(3):
         """  
         # add test accuracy
         log.store_info(test_acc=5)    
-
-log.to_file(folder)
-print(log.runs_info)

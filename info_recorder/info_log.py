@@ -4,8 +4,8 @@ import pickle
 class InfoLog():
 
 
-    def __init__(self, print_info=True, saving_path=None):
-        self._saving_path = saving_path
+    def __init__(self, print_info=True, saving_folder=None):
+        self._saving_folder = saving_folder
         self._print_info = print_info
         self._run_counter = -1
         self._batch_counter = -1
@@ -93,15 +93,15 @@ class InfoLog():
             
             # print test acc and best val loss
             if self._print_info:
-                print("\n\tBEST VAL LOSS is %.3f, related VAL ACC is %.3f in epoch %i" % \
+                print("\n\tBEST RESULTS:\tval_loss: %.3f,  val_acc: %.3f,  epoch: %i" % \
                     (self._batch_info['best']['val_loss'],
                      self._batch_info['best']['val_acc'], 
                      self._batch_info['best']['epoch_num']), end='\n')
                 print("\tTEST ACC: %.3f\n\n" % (self._batch_info['test_acc']))
             
             # save run information to file
-            if self._saving_path != None:
-                saving_path = self._saving_path+"/run_"+str(self._run_counter)+".pkl"
+            if self._saving_folder != None:
+                saving_path = self._saving_folder+"/run_"+str(self._run_counter)+".pkl"
                 self._to_file(saving_path)
         
         
@@ -109,5 +109,3 @@ class InfoLog():
 
         with open(saving_path, "wb") as file:
             pickle.dump(self.run_info, file, pickle.HIGHEST_PROTOCOL)
-    
-
