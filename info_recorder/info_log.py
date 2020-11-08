@@ -4,32 +4,22 @@ import pickle
 class InfoLog():
 
 
-    def __init__(self, print_info=True, saving_folder=None):
+    def __init__(self, run, print_info=True, saving_folder=None):
+        
         self._saving_folder = saving_folder
         self._print_info = print_info
-        self._run_counter = -1
+        
+        self._run = run
         self._batch_counter = -1
         self._epoch_counter = -1
 
         self._batch_info = None
-        self._run_info = None
-
-
-    def new_run(self):
-        
-        # increment run counter
-        self._run_counter += 1
-
-        # initialize run info container, an empty list, contains info related to each class batch 
         self.run_info = []
-
-        # initialize class batch counter
-        self._batch_counter = -1
 
         # print on console if requested
         if self._print_info:
             print("RUN %i ------------------------------------------------------------------------------------\n" % \
-                (self._run_counter), end='\n')
+                (self._run), end='\n')
 
 
     def new_class_batch(self):
@@ -54,6 +44,7 @@ class InfoLog():
         if self._print_info:
             print("\tCLASS BATCH %i\n" % (self._batch_counter), end='\n')
     
+
     def new_epoch(self):
 
         # increment epoch counter
@@ -101,7 +92,7 @@ class InfoLog():
             
             # save run information to file
             if self._saving_folder != None:
-                saving_path = self._saving_folder+"/run_"+str(self._run_counter)+".pkl"
+                saving_path = self._saving_folder+"/run_"+str(self._run)+".pkl"
                 self._to_file(saving_path)
         
         

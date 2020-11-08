@@ -7,12 +7,10 @@ try:
 except FileExistsError:
     pass
 
-log = InfoLog(saving_folder=folder)
-
 # cycle on runs
 for i in range(3):
-    # make the log know a new run starts
-    log.new_run() 
+    
+    log = InfoLog(run=i, saving_folder=folder) 
     # cycle on class batches
     for j in range(10):
         # make the log know a new batch of classes starts
