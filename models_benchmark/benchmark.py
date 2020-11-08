@@ -3,27 +3,48 @@ import os
 
 class Benchmark():
     
-    def __init__(self, num_epochs, criterion, optimizer, scheduler, 
-    InfoLog, device='cuda', saving_folder=None):
+    def __init__(self, num_epochs, batch_size, dataloaders, device='cuda', saving_folder=None):
         
         # create a saving folder for the current method
-        if saving_folder!= None and method_name!= None:
+        if saving_folder!= None:
             try:
                 os.mkdir(saving_folder)
             except FileExistsError:
+                pass
 
+        self.saving_folder = saving_folder
         self.device = device
         self.num_epochs = num_epochs
         
         self.batch_size = batch_size
         self.dataloaders = dataloaders
+        
         self.model = None
+        self.criterion = None
+        self.optimizer = None
+        self.scheduler = None
 
+        self.log = None 
+
+
+    def set_criterion(self, criterion):
         self.criterion = criterion
+
+    
+    def set_optimizer(self, optimizer):
         self.optimizer = optimizer
+
+
+    def set_scheduler(self, scheduler):
         self.scheduler = scheduler
 
-        self.log = InfoLog(saving_folder=saving_folder)
+
+    def set_model(self, model):
+        self.model = model.to(self.device)
+
+
+    def set_infoLog(self, info_log_class):
+        self.log = info_log_class(saving_folder=self.saving_folder)
         
 
     def _do_batch(self, inputs, labels, train=True):
@@ -103,7 +124,7 @@ class Benchmark():
     def do_class_batch(self, run, class_batch):
         
         # cycle for each epoch
-        for epoch in self.num_epochs:
+        for epoch in range(self.num_epochs):
             self.log.new_epoch()
                     
             # get training info
@@ -130,4 +151,3 @@ class Benchmark():
                 
         # update info log
         self.log.store_info(test_acc=test_acc)
-
