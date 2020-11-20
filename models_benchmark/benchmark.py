@@ -1,6 +1,10 @@
 from copy import deepcopy
 import os
-
+"""
+ERROR
+How many classes are you currently using and what is the shape of your output?
+Note that class indices start at 0 so your target should contain indices in the range [0, nb_classes-1].
+"""
 class Benchmark():
     
     def __init__(self, num_epochs, batch_size, dataloaders, device='cuda', saving_folder=None):
@@ -14,8 +18,7 @@ class Benchmark():
 
         self.saving_folder = saving_folder
         self.device = device
-        self.num_epochs = num_epochs
-        
+        self.num_epochs = num_epochsgit status
         self.batch_size = batch_size
         self.dataloaders = dataloaders
         
@@ -43,8 +46,8 @@ class Benchmark():
         self.model = model.to(self.device)
 
 
-    def set_infoLog(self, info_log_class):
-        self.log = info_log_class(saving_folder=self.saving_folder)
+    def set_infoLog(self, info_log_class, run):
+        self.log = info_log_class(saving_folder=self.saving_folder, run=run)
         
 
     def _do_batch(self, inputs, labels, train=True):
@@ -139,10 +142,10 @@ class Benchmark():
                 train_loss=train_epoch_loss, 
                 val_acc=val_epoch_acc,
                 val_loss=val_epoch_loss,
-                model_params=deepcopy(self.model.state_dict()))
+                state_dict=deepcopy(self.model.state_dict()))
                 
         # load best model state_dict
-        best_state_dict = self.log.run_info[-1]['best']['state_dict']
+        best_state_dict = self.log.batch_info['best']['state_dict']
         self.model.load_state_dict(best_state_dict)
                 
         # get test dataloader and compute test acc
