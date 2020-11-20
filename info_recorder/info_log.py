@@ -9,11 +9,11 @@ class InfoLog():
         self._saving_folder = saving_folder
         self._print_info = print_info
         
-        self._run = run
+        self._run = run # run number 
         self._batch_counter = -1
         self._epoch_counter = -1
 
-        self._batch_info = None
+        self.batch_info = None
         self.run_info = []
 
         # print on console if requested
@@ -28,7 +28,7 @@ class InfoLog():
         self._batch_counter += 1
 
         # initialize a new batch info container, a dictionary object
-        self._batch_info = {
+        self.batch_info = {
             'train_acc':[],
             'train_loss':[],
             'val_acc':[],
@@ -55,40 +55,40 @@ class InfoLog():
     test_acc=None, state_dict=None):
 
         if train_acc!=None and train_loss!=None and val_acc!=None and val_loss!=None and state_dict!=None:
-            self._batch_info['train_acc'].append(train_acc)
-            self._batch_info['train_loss'].append(train_loss)
-            self._batch_info['val_acc'].append(val_acc)
-            self._batch_info['val_loss'].append(val_loss)
+            self.batch_info['train_acc'].append(train_acc)
+            self.batch_info['train_loss'].append(train_loss)
+            self.batch_info['val_acc'].append(val_acc)
+            self.batch_info['val_loss'].append(val_loss)
             
             # update best info
-            if val_loss < self._batch_info['best']['val_loss']:
-                self._batch_info['best']['val_acc'] = val_acc
-                self._batch_info['best']['val_loss'] = val_loss
-                self._batch_info['best']['epoch_num'] = self._epoch_counter
-                self._batch_info['best']['state_dict'] = state_dict
+            if val_loss < self.batch_info['best']['val_loss']:
+                self.batch_info['best']['val_acc'] = val_acc
+                self.batch_info['best']['val_loss'] = val_loss
+                self.batch_info['best']['epoch_num'] = self._epoch_counter
+                self.batch_info['best']['state_dict'] = state_dict
                 
             # print train_acc, train_loss, val_acc, val_loss
             if self._print_info:
                 print("\tepoch %2i:    train_acc: %.3f  train_loss: %.3f  val_acc: %.3f  val_loss: %.3f" % \
                     (self._epoch_counter, 
-                     self._batch_info['train_acc'][-1], 
-                     self._batch_info['train_loss'][-1], 
-                     self._batch_info['val_acc'][-1], 
-                     self._batch_info['val_loss'][-1]), end='\n')
+                     self.batch_info['train_acc'][-1], 
+                     self.batch_info['train_loss'][-1], 
+                     self.batch_info['val_acc'][-1], 
+                     self.batch_info['val_loss'][-1]), end='\n')
 
         elif test_acc != None:
-            self._batch_info['test_acc'] = test_acc
+            self.batch_info['test_acc'] = test_acc
             
             # update run info
-            self.run_info.append(self._batch_info)
+            self.run_info.append(self.batch_info)
             
             # print test acc and best val loss
             if self._print_info:
-                print("\n\tBEST RESULTS:\tval_loss: %.3f,  val_acc: %.3f,  epoch:git push  %i" % \
-                    (self._batch_info['best']['val_loss'],
-                     self._batch_info['best']['val_acc'], 
-                     self._batch_info['best']['epoch_num']), end='\n')
-                print("\tTEST ACC: %.3f\n\n" % (self._batch_info['test_acc']))
+                print("\n\tBEST RESULTS:\tval_loss: %.3f,  val_acc: %.3f,  epoch: %i" % \
+                    (self.batch_info['best']['val_loss'],
+                     self.batch_info['best']['val_acc'], 
+                     self.batch_info['best']['epoch_num']), end='\n')
+                print("\tTEST ACC: %.3f\n\n" % (self.batch_info['test_acc']))
             
             # save run information to file
             if self._saving_folder != None:
