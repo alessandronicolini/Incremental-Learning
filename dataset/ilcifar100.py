@@ -50,7 +50,7 @@ class ilCIFAR100(CIFAR100):
                 2D-array: rows are associated to batch number and columns to batch class labels
         """
         labels = np.arange(0, 100, 1)
-        #self._rs.shuffle(labels)
+        #self._rs.shuffle(labels) # CHECK THIS PART
         labels = labels.reshape((10, -1)) # each row contains the classes for the corrisponding batch
         
        return labels

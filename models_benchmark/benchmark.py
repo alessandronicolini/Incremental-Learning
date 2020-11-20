@@ -1,4 +1,5 @@
 from copy import deepcopy
+import torch
 import os
 """
 ERROR
@@ -125,6 +126,8 @@ class Benchmark():
 
 
     def do_class_batch(self, run, class_batch):
+        
+        self.log.new_class_batch()
         
         # cycle for each epoch
         for epoch in range(self.num_epochs):
