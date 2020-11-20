@@ -33,7 +33,7 @@ class ilCIFAR100(CIFAR100):
         
         super(ilCIFAR100, self).__init__(root=root, train=train, transform=transform, 
         target_transform=target_transform, download=download)
-        
+
         self._rs = np.random.RandomState(seed) # set random seed
         self._classes_per_batch = self._get_classes_per_batch() 
         if train:
@@ -50,9 +50,10 @@ class ilCIFAR100(CIFAR100):
                 2D-array: rows are associated to batch number and columns to batch class labels
         """
         labels = np.arange(0, 100, 1)
-        self._rs.shuffle(labels)
+        #self._rs.shuffle(labels)
         labels = labels.reshape((10, -1)) # each row contains the classes for the corrisponding batch
-        return labels
+        
+       return labels
 
     def _make_test_batches(self):
         """
