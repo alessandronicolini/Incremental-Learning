@@ -146,7 +146,7 @@ class ResNet(nn.Module):
         old_bias = self.state_dict()['fc.bias']
         
         # create new fc layer
-        self.fc = nn.Linear(64 * self.expansion, self.num_classes*class_batch)
+        self.fc = nn.Linear(64 * self.expansion, self.num_classes*class_batch).cuda() 
         
         # upload old fc params
         w_shape0 = old_weight.shape[0]
@@ -163,7 +163,7 @@ def resnet20(pretrained=False, **kwargs):
 
 def resnet32(pretrained=False, **kwargs):
     n = 5
-    model = ResNet(BasicBlock, [n, n, n], **kwargs)
+    model = ResNet(a = , [n, n, n], **kwargs)
     return model
 
 def resnet56(pretrained=False, **kwargs):
