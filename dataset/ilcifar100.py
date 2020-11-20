@@ -53,7 +53,7 @@ class ilCIFAR100(CIFAR100):
         #self._rs.shuffle(labels) # CHECK THIS PART
         labels = labels.reshape((10, -1)) # each row contains the classes for the corrisponding batch
         
-       return labels
+        return labels
 
     def _make_test_batches(self):
         """

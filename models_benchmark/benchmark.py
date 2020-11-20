@@ -19,7 +19,7 @@ class Benchmark():
 
         self.saving_folder = saving_folder
         self.device = device
-        self.num_epochs = num_epochsgit status
+        self.num_epochs = num_epochs
         self.batch_size = batch_size
         self.dataloaders = dataloaders
         
@@ -128,7 +128,7 @@ class Benchmark():
     def do_class_batch(self, run, class_batch):
         
         self.log.new_class_batch()
-        
+
         # cycle for each epoch
         for epoch in range(self.num_epochs):
             self.log.new_epoch()
